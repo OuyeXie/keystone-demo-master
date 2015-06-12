@@ -48,12 +48,81 @@ Then, create a `.env` file in the project folder (the one with this readme) and 
     GA_PROPERTY={your google analytics property} // optional
     PORT={the port to listen on} // defaults to 3000, automatically set by paas (e.g. heroku)
 
+**To connect mongodb with auth info using mongoose:**
+
+mongoose.connect('mongodb://username:password@host:port/database?options...');
 
 ### Installing MongoDB
 
 By default, KeystoneJS will look for a MongoDB server running on localhost on the default port, and connect to it. If you're getting errors related to the MongoDB connection, make sure your MongoDB server is running.
 
 You can find more information on how to install MongoDB and other dependencies on our [generator-keystone](https://github.com/keystonejs/generator-keystone) README.
+
+**erase mongodb**
+
+sudo service mongod stop
+
+sudo yum erase $(rpm -qa | grep mongodb-org)
+
+sudo rm -r /var/log/mongodb
+
+sudo rm -r /var/lib/mongo
+
+sudo rm /tmp/mongodb-27017.sock
+
+**Install mongodb and set up on ec2:**
+
+sudo nano /etc/yum.repos.d/mongodb-org-3.0.repo
+[mongodb-org-3.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.0/x86_64/
+gpgcheck=0
+enabled=1
+
+sudo yum install -y mongodb-org
+
+sudo service mongod start
+OR (mongod --port 27017 --dbpath /home/ec2-user/mongodb --oplogSize 128 --logpath /home/ec2-user/log --auth --fork)
+
+cd
+
+sudo nano .bashrc
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+source .bashrc
+
+mongo
+
+use admin
+
+db.createUser( { user: "root",
+          pwd: "yebao1919",
+          roles: [ "userAdminAnyDatabase",
+                   "dbAdminAnyDatabase",
+                   "readWriteAnyDatabase",
+                   "clusterAdmin"
+
+] } )
+
+exit
+
+sudo service mongod stop
+OR (sudo kill pid)
+
+mkdir mongo
+
+mongod --port 27017 --dbpath /home/ec2-user/mongodb --oplogSize 128 --logpath /home/ec2-user/log --auth --fork
+
+mongo 127.0.0.1:27017/admin -u root -p yebao1919
+
+use test
+
+db.addUser({user:"test",pwd:"test",roles:["readWrite"]})
+
+exit
+
+mongo 127.0.0.1:27017/test -u test -p test
 
 ### Configuring the project defaults
 
